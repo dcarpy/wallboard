@@ -19,7 +19,6 @@ import org.slf4j.LoggerFactory;
 public class Wallboard {
 
     // Initial sequence
-    //private String sequenceOrder = "678899::;;<<";
     private String sequenceOrder = "6789";
     private static Logger logger = LoggerFactory.getLogger(Wallboard.class);
 
@@ -73,17 +72,16 @@ public class Wallboard {
         sign.WriteTextFileLabel(hudsonFeedReader.getSeq(), "Jenkins CI", hudsonFeedReader.getLabels());
         sign.WriteTextFileLabel9();
 
-        //
         final ScheduledExecutorService scheduledThreadPool = Executors.newScheduledThreadPool(1);
-        // every 1 minute
+        // fire every 1 minute
         scheduledThreadPool.scheduleAtFixedRate(hudsonFeedReader, 0, 1, TimeUnit.MINUTES);
-        // every 30 minutes
+        // fire every 30 minutes
         scheduledThreadPool.scheduleAtFixedRate(slashdotFeedReader, 0, 30, TimeUnit.MINUTES);
-        // every 15 minutes
+        // fire every 15 minutes
         scheduledThreadPool.scheduleAtFixedRate(mndotFeedReader, 0, 15, TimeUnit.MINUTES);
-        // every 10 minutes
+        // fire every 10 minutes
         scheduledThreadPool.scheduleAtFixedRate(yahooFeedReader, 0, 10, TimeUnit.MINUTES);
-        // every 20 minutes
+        // fire every 20 minutes
         scheduledThreadPool.scheduleAtFixedRate(stockFeedReader, 0, 20, TimeUnit.MINUTES);
 
         // add shutdown hook
