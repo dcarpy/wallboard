@@ -5,6 +5,14 @@ import com.oracle.wallboard.modules.mndot.MndotFeedReader;
 import com.oracle.wallboard.modules.slashdot.SlashdotFeedReader;
 import com.oracle.wallboard.modules.yahoo.StockFeedReader;
 import com.oracle.wallboard.modules.yahoo.YahooFeedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import org.apache.commons.configuration.Configuration;
+import org.apache.commons.configuration.ConfigurationException;
+import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.io.FileUtils;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -22,10 +30,37 @@ public class Wallboard {
     private String sequenceOrder = "6789";
     private static Logger logger = LoggerFactory.getLogger(Wallboard.class);
 
-    public void run() {
+    public void run() throws FileNotFoundException {
 
-        System.setProperty("http.proxyHost", "www-proxy.us.oracle.com");
-        System.setProperty("http.proxyPort", "80");
+        // Toplevel directory
+        File topDir = new File(System.getProperty("user.dir"));
+
+        // Load properties file
+        PropertiesConfiguration config = new PropertiesConfiguration();
+        File configFile = new File(topDir, "wallboard.properties");
+        try {
+            config.load(new FileInputStream(configFile));
+        } catch (ConfigurationException e) {
+            System.out.println("Exception : " + e);
+            return;
+        }
+
+        // Indicates what the change log is based on
+        String proxyHost = config.getString("wallboard.proxy.host");
+        String proxyPort = config.getString("wallboard.proxy.port", "80");
+        String proxyUser = config.getString("wallboard.proxy.user");
+        String proxyPassword = config.getString("wallboard.proxy.password");
+
+        if (proxyHost != null) {
+            System.setProperty("http.proxyHost", proxyHost);
+        }
+        System.setProperty("http.proxyPort", proxyPort);
+        if (proxyUser != null) {
+            System.setProperty("http.proxyUser", proxyUser);
+        }
+        if (proxyPassword != null) {
+            System.setProperty("http.proxyPassword", proxyPassword);
+        }
 
         Sign sign = new Sign();
         sign.ClearMemory();
